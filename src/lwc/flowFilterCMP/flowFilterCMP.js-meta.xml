@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>55.0</apiVersion>
+    <description>Flow Filter CMP</description>
+    <isExposed>true</isExposed>
+    <masterLabel>Flow Filter CMP</masterLabel>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen"
+                      configurationEditor="c-flow-filter-c-p-e">
+            <propertyType name="theObj" extends="SObject" label="The Object" description="Generic sObject data type used for input sObject properties" />
+            <property label="The Records" name="recList" type="{theObj[]}" description="Collection of Record(s) to pass from Flow"/>
+            <property label="Selected Records" name="selectedRecList" type="{theObj[]}" description="Collection of selected Records" role="outputOnly"/>
+            <property label="Allow Select" name="allowSelect" type="Boolean" description="Allow users to select Records pass to Flow" role="inputOnly"/>
+            <property label="Return Updated Records Only" name="returnUpdatedRecs" type="Boolean" description="Only Return Updated Records to Flow" role="inputOnly"/>
+            <property label="Include Back Button" name="includeBackButton" type="Boolean" description="Provide Users the option to return to the previous Flow Screen" role="inputOnly"/>
+            <property name="fldListJSON" type="String" role="inputOnly" />
+            <property name="objName" type="String" role="inputOnly" />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

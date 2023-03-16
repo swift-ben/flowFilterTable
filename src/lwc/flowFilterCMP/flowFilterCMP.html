@@ -1,0 +1,31 @@
+<!--
+ - Created by bswif on 12/27/2022.
+ -->
+
+<!-- Flow Filter Cmp -->
+<template>
+    <lightning-layout multiple-rows>
+        <lightning-layout-item size="12" padding="around-small">
+            <c-flow-filter-filter-panel fld-list={filterFlds} onfiltersupdate={handleFilterUpdate}></c-flow-filter-filter-panel>
+        </lightning-layout-item>
+        <lightning-layout-item size="12" padding="around-small">
+            <c-flow-filter-table rec-list={recList} allow-select={allowSelect} fld-list={fldList} return-updated-recs={returnUpdatedRecs}></c-flow-filter-table>
+        </lightning-layout-item>
+        <lightning-layout-item size="12" padding="around-small" class="slds-text-align_right">
+            <lightning-button
+                    label="Next"
+                    variant="brand"
+                    onclick={handleNext}
+                    disabled={isLoading}
+            ></lightning-button>
+        </lightning-layout-item>
+        <lightning-layout-item size="12" padding="around-small" class="slds-text-align_left">
+            <lightning-button
+                    label="Back"
+                    variant="brand"
+                    onclick={handleBack}
+                    disabled={isLoading}
+            ></lightning-button>
+        </lightning-layout-item>
+    </lightning-layout>
+</template>

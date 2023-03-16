@@ -1,0 +1,93 @@
+<!--
+ - Created by bswif on 12/27/2022.
+ -->
+
+<!-- Flow Filter Filter -->
+<template>
+    <lightning-layout multiple-rows>
+        <!--text filter-->
+        <lightning-layout-item class="slds-align_absolute-center" size="12">
+            {fld.dispLabel}
+        </lightning-layout-item>
+        <lightning-layout-item if:true={isText} padding="around-small" size="12">
+            <lightning-input
+                    variant="label-hidden"
+                    value={_fld.containsText}
+                    type="text"
+                    name="containsText"
+                    onchange={handleUpdateFilter}
+            ></lightning-input>
+        </lightning-layout-item>
+
+        <!--picklist filter -->
+        <lightning-layout-item if:true={isPicklist} padding="around-small" size="12">
+            <c-multi-select-combo-box
+                    multi-select="true"
+                    options={fld.pickVals}
+                    selected-values={selectedPicklistVals}
+                    onselect={handleComboboxUpdate}
+            >
+            </c-multi-select-combo-box>
+        </lightning-layout-item>
+
+        <!-- decimal filters -->
+        <lightning-layout-item if:true={isDecimal} padding="around-small" size="12">
+            <lightning-input
+                    variant="label-hidden"
+                    value={_fld.rangeMin}
+                    type="number"
+                    step=".01"
+                    name="rangeMin"
+                    onchange={handleUpdateFilter}
+            ></lightning-input>
+        </lightning-layout-item>
+        <lightning-layout-item if:true={isDecimal} class="slds-align_absolute-center" size="12">
+            to
+        </lightning-layout-item>
+        <lightning-layout-item if:true={isDecimal} padding="around-small" size="12">
+            <lightning-input
+                    variant="label-hidden"
+                    value={_fld.rangeMax}
+                    type="number"
+                    step=".01"
+                    name="rangeMax"
+                    onchange={handleUpdateFilter}
+            ></lightning-input>
+        </lightning-layout-item>
+
+        <!-- boolean filter -->
+        <lightning-layout-item if:true={isBoolean} padding="around-small" size="12">
+            <lightning-combobox
+                    variant="label-hidden"
+                    value={_fld.bool}
+                    options={boolOpts}
+                    name="bool"
+                    onchange={handleUpdateFilter}
+            >
+            </lightning-combobox>
+        </lightning-layout-item>
+
+        <!-- date filters -->
+        <lightning-layout-item if:true={isDate} padding="around-small" size="12">
+            <lightning-input
+                    variant="label-hidden"
+                    value={_fld.dateMin}
+                    type="date"
+                    name="dateMin"
+                    onchange={handleUpdateFilter}
+            ></lightning-input>
+        </lightning-layout-item>
+        <lightning-layout-item if:true={isDate} class="slds-align_absolute-center" size="12">
+            to
+        </lightning-layout-item>
+        <lightning-layout-item if:true={isDate} padding="around-small" size="12">
+            <lightning-input
+                    variant="label-hidden"
+                    value={_fld.dateMax}
+                    type="date"
+                    name="dateMax"
+                    onchange={handleUpdateFilter}
+            ></lightning-input>
+        </lightning-layout-item>
+    </lightning-layout>
+</template>

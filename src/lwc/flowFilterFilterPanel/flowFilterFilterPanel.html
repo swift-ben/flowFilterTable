@@ -1,0 +1,21 @@
+<!--
+ - Created by bswif on 12/27/2022.
+ -->
+
+<!-- Flow Filter Filter Panel -->
+<template>
+    <lightning-layout multiple-rows>
+        <template for:each={_fldList} for:item="fld">
+            <lightning-layout-item
+                    key={fld.fldName}
+                    padding="around-small"
+                    size="2"
+                    small-device-size="12"
+                    medium-device-size="6"
+                    large-device-size="2"
+            >
+                <c-flow-filter-filter fld={fld} key={fld.fldName} onfilterupdate={handleFilterUpdate}></c-flow-filter-filter>
+            </lightning-layout-item>
+        </template>
+    </lightning-layout>
+</template>

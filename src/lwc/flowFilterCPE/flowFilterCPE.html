@@ -1,0 +1,292 @@
+<!--
+ - Created by bswif on 12/27/2022.
+ -->
+
+<!-- Flow Filter Cpe -->
+<template>
+    <!-- spinner on load and submit -->
+    <div if:true={showSpinner}>
+        <lightning-spinner style="position: fixed;" alternative-text="Loading..."></lightning-spinner>
+        <div style="position: fixed;" class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+
+    <lightning-layout multiple-rows>
+        <lightning-layout-item
+                size="12"
+                padding="around-small"
+                if:false={showErr}
+        >
+            <lightning-combobox
+                    value={recList}
+                    options={recListOpts}
+                    field-level-help="Select a Record Collection variable or lookup from the Flow to choose Records to display in the form(s)"
+                    onchange={handleRecListChange}
+                    required
+                    label="Record Collection"
+            >
+            </lightning-combobox>
+        </lightning-layout-item>
+        <lightning-layout-item
+                size="12"
+                padding="around-small"
+                if:false={showErr}
+        >
+            <lightning-input
+                    type="checkbox"
+                    name="allowSelect"
+                    checked={allowSelect}
+                    if:true={recList}
+                    field-level-help="Check to allow Users to select records to return to the flow"
+                    onchange={handleBooleanInputChange}
+                    label="Allow Selection of Records"
+            >
+            </lightning-input>
+            <span class="slds-align_absolute-center errSpan" if:true={allowSelect}>Selected rows will be passed to the collection set in Advanced options</span>
+        </lightning-layout-item>
+        <lightning-layout-item
+                size="12"
+                padding="around-small"
+                if:false={showErr}
+        >
+            <lightning-input
+                    type="checkbox"
+                    name="returnUpdatedRecs"
+                    checked={returnUpdatedRecs}
+                    if:true={recList}
+                    field-level-help="Check to have Flow only return updated Records instead of all Records from table"
+                    onchange={handleBooleanInputChange}
+                    label="Return only updated Records from table"
+            >
+            </lightning-input>
+        </lightning-layout-item>
+        <lightning-layout-item
+                size="12"
+                padding="around-small"
+                if:false={showErr}
+        >
+            <lightning-input
+                    type="checkbox"
+                    name="includeBackButton"
+                    checked={includeBackButton}
+                    if:true={recList}
+                    field-level-help="Provide Users the option to return to the previous Flow Screen"
+                    onchange={handleBooleanInputChange}
+                    label="Include Back Button"
+            >
+            </lightning-input>
+        </lightning-layout-item>
+        <lightning-layout-item
+                size="12"
+                padding="around-small"
+                if:false={showErr}
+        >
+            <!-- button to open field config modal -->
+            <lightning-button
+                    if:true={showFldConfigButton}
+                    label="Configure Filters and Columns"
+                    variant="brand"
+                    onclick={toggleShowFldConfig}
+                    class="slds-align_absolute-center"
+            ></lightning-button>
+        </lightning-layout-item>
+    </lightning-layout>
+
+    <div if:true={showFldConfig}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-modal_large slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={toggleShowFldConfig}>
+                        <lightning-icon icon-name="utility:close"
+                                        alternative-text="close"
+                                        variant="inverse"
+                                        size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Set Fields</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning-layout multiple-rows>
+                        <lightning-layout-item
+                                size="6"
+                                padding="around-small"
+                        >
+                            <lightning-combobox
+                                    value={tempFld.fldName}
+                                    name="fldName"
+                                    class="fldName"
+                                    options={fldOpts}
+                                    field-level-help="Select a field"
+                                    onchange={handleUpdateFldName}
+                                    required
+                                    label="Field"
+                            >
+                            </lightning-combobox>
+                        </lightning-layout-item>
+                        <lightning-layout-item
+                            size="12"
+                            padding="around-small"
+                        >
+                            <lightning-button
+                                class="slds-align_absolute-center"
+                                label="Add Field"
+                                variant="brand"
+                                onclick={handleAddFld}
+                            >
+
+                            </lightning-button>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                    <!-- .fldName -->
+                    <div class="slds-grid slds-grid_vertical">
+                        <div class="slds-scrollable slds-grow">
+                            <div class="slds-scrollable_none">
+                                <table
+                                        aria-multiselectable="true"
+                                        class="
+                                            slds-table slds-no-row-hover
+                                            slds-table_bordered
+                                            slds-table_fixed-layout
+                                            slds-table_resizable-cols
+                                        "
+                                        role="grid"
+                                >
+                                    <thead>
+                                        <tr class="slds-line-height_reset">
+                                            <th>Remove</th>
+                                            <th>Field</th>
+                                            <th>Display Label</th>
+                                            <th>Allow Inline Edit</th>
+                                            <th>Allow Sort</th>
+                                            <th>Filter</th>
+                                            <th>Order</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={_flds} for:item="fld" >
+                                            <tr
+                                                    key={fld.fldName}
+                                                    draggable="true"
+                                                    ondrop={Drop}
+                                                    ondragstart={DragStart}
+                                                    ondragover={DragOver}
+                                                    data-index={fld.theIndex}
+                                            >
+                                                <td role="gridcell">
+                                                    <lightning-icon
+                                                            data-index={fld.theIndex}
+                                                            onclick={handleRemoveFld}
+                                                            variant="error"
+                                                            icon-name="utility:delete"
+                                                            alternative-text="Remove"
+                                                            size="small"
+                                                    >
+                                                    </lightning-icon>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <div class="slds-cell-wrap">
+                                                        <lightning-combobox
+                                                                value={fld.fldName}
+                                                                data-index={fld.theIndex}
+                                                                options={fldOpts}
+                                                                onchange={handleUpdateFld}
+                                                                variant="label-hidden"
+                                                                disabled
+                                                        >
+                                                        </lightning-combobox>
+                                                    </div>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <lightning-input
+                                                            label="Label"
+                                                            variant="label-hidden"
+                                                            value={fld.dispLabel}
+                                                            key={fld.fldName}
+                                                            type="text"
+                                                            name="dispLabel"
+                                                            data-index={fld.theIndex}
+                                                            onchange={handleUpdateFld}
+                                                    ></lightning-input>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <lightning-input
+                                                            type="checkbox"
+                                                            checked={fld.allowEdit}
+                                                            name="allowEdit"
+                                                            data-index={fld.theIndex}
+                                                            onchange={handleUpdateFld}
+                                                            label="Allow Inline Edit"
+                                                            variant="label-hidden"
+                                                    >
+                                                    </lightning-input>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <lightning-input
+                                                            type="checkbox"
+                                                            checked={fld.allowSort}
+                                                            name="allowSort"
+                                                            data-index={fld.theIndex}
+                                                            onchange= {handleUpdateFld}
+                                                            disabled={fld.isRef}
+                                                            label="Allow Sort"
+                                                            variant="label-hidden"
+                                                    >
+                                                    </lightning-input>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <lightning-input
+                                                            type="checkbox"
+                                                            checked={fld.allowFilter}
+                                                            name="allowFilter"
+                                                            data-index={fld.theIndex}
+                                                            onchange= {handleUpdateFld}
+                                                            disabled={fld.isRef}
+                                                            label="Allow Filter"
+                                                            variant="label-hidden"
+                                                    >
+                                                    </lightning-input>
+                                                </td>
+                                                <td role="gridcell">
+                                                    <lightning-icon
+                                                            data-index={fld.theIndex}
+                                                            onclick={handleRemoveFld}
+                                                            icon-name="utility:move"
+                                                            alternative-text="Order"
+                                                            size="small"
+                                                    >
+                                                    </lightning-icon>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-layout multiple-rows>
+                        <!--submit fields buttons -->
+                        <lightning-layout-item size="6" padding="around-small">
+                            <lightning-button
+                                    class="slds-float_right"
+                                    label="Cancel"
+                                    onclick={toggleShowFldConfig}
+                                    variant="brand"
+                            ></lightning-button>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="6" padding="around-small">
+                            <lightning-button
+                                    class="slds-float_left"
+                                    label="Submit Fields"
+                                    variant="brand"
+                                    onclick={handleSubmitFlds}
+                                    disabled={isSubmitting}
+                            ></lightning-button>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+</template>

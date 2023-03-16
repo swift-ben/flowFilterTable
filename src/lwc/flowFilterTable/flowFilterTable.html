@@ -1,0 +1,23 @@
+<!--
+ - Created by bswif on 12/27/2022.
+ -->
+
+<!-- Flow Filter Table -->
+<template>
+    <lightning-datatable
+            key-field="Id"
+            selected-rows={selectedRowIds}
+            data={filteredRecList}
+            hide-checkbox-column={hideCheckBox}
+            columns={colList}
+            sorted-by={sortedBy}
+            suppress-bottom-bar
+            default-sort-direction={defaultSortDirection}
+            sorted-direction={sortDirection}
+            onsort={onHandleSort}
+            min-column-width="100"
+            onrowselection={handleRowSelection}
+            oncellchange={handleInlineEdit}
+    >
+    </lightning-datatable>
+</template>
